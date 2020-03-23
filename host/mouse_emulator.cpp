@@ -6,8 +6,6 @@
 #include <SPI.h>
 #include <myutil.h>
 
-const int BAUD_RATE = 9600;
-
 ////////////////////////////
 class MouseRptParser : public MouseReportParser {
 protected:
@@ -110,7 +108,7 @@ MouseEmulator::MouseEmulator() {
 }
 
 void MouseEmulator::begin() {
-  Serial.begin(BAUD_RATE);
+  Serial.begin(MOUSE_BAUD_RATE);
   myTransfer.begin(Serial);
 
   Usb.Init();

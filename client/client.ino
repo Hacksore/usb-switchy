@@ -12,7 +12,7 @@ void setup() {
 
   // testing with the MKR1000 which uses Serial1
   // need to expierment with increasing this speed
-  Serial1.begin(9600);
+  Serial1.begin(MOUSE_BAUD_RATE);
   myTransfer.begin(Serial1);
 
 }
