@@ -27,24 +27,29 @@ HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
 MouseRptParser Prs;
 SerialTransfer myTransfer;
 
-void transmitData(uint8_t packet[]) {
-  int arrayLength = sizeof(packet) / sizeof(uint8_t);
+void transmitData(uint16_t packet[]) {
 
-  for(int i=0; i<arrayLength; i++){
-    myTransfer.txBuff[i] = packet[i];
+  myTransfer.txBuff[0] = packet[0];
+
+  if (packet[1] != NULL && packet[2] != NULL) {
+    myTransfer.txBuff[1] = packet[1];
+    myTransfer.txBuff[2] = packet[2];
+
+    myTransfer.sendData(3);
+    return;
   }
   
-  myTransfer.sendData(arrayLength);
+  myTransfer.sendData(1);
 }
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi) {
   int mouseX = mi->dX;
   int mouseY = mi->dY;
 
-  uint8_t payload[3] = {
+  uint16_t payload[3] = {
     MOUSE_MOVE,
-    char(mouseX),
-    char(mouseY)
+    mouseX,
+    mouseY
   };
 
   transmitData(payload);
@@ -52,7 +57,7 @@ void MouseRptParser::OnMouseMove(MOUSEINFO *mi) {
 };
 
 void MouseRptParser::OnLeftButtonUp (MOUSEINFO *mi) {
-  uint8_t payload[1] = {
+  uint16_t payload[1] = {
     MOUSE_UP_LEFT
   };
 
@@ -60,7 +65,7 @@ void MouseRptParser::OnLeftButtonUp (MOUSEINFO *mi) {
 };
 
 void MouseRptParser::OnLeftButtonDown (MOUSEINFO *mi) {
-  uint8_t payload[1] = {
+  uint16_t payload[1] = {
     MOUSE_DOWN_LEFT
   };
 
@@ -68,7 +73,7 @@ void MouseRptParser::OnLeftButtonDown (MOUSEINFO *mi) {
 };
 
 void MouseRptParser::OnRightButtonUp  (MOUSEINFO *mi) {
-  uint8_t payload[1] = {
+  uint16_t payload[1] = {
     MOUSE_UP_RIGHT
   };
 
@@ -76,7 +81,7 @@ void MouseRptParser::OnRightButtonUp  (MOUSEINFO *mi) {
 };
 
 void MouseRptParser::OnRightButtonDown  (MOUSEINFO *mi) {
-  uint8_t payload[1] = {
+  uint16_t payload[1] = {
     MOUSE_DOWN_RIGHT
   };
 
@@ -84,7 +89,7 @@ void MouseRptParser::OnRightButtonDown  (MOUSEINFO *mi) {
 };
 
 void MouseRptParser::OnMiddleButtonUp (MOUSEINFO *mi) {
-  uint8_t payload[1] = {
+  uint16_t payload[1] = {
     MOUSE_UP_MIDDLE
   };
 
@@ -92,7 +97,7 @@ void MouseRptParser::OnMiddleButtonUp (MOUSEINFO *mi) {
 };
 
 void MouseRptParser::OnMiddleButtonDown (MOUSEINFO *mi) {
-  uint8_t payload[1] = {
+  uint16_t payload[1] = {
     MOUSE_DOWN_MIDDLE
   };
 

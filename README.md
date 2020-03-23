@@ -8,4 +8,4 @@ I want to build something that overcomes the delay that mondern KVMs have. They 
 
 ### Diagram for Mouse
 
-![Imgur](https://i.imgur.com/rOVhqUp.png)
+![Imgur](diagram.png)
