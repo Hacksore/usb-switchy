@@ -26,20 +26,22 @@ void loop() {
       {
         int x = myTransfer.rxBuff[1];
         int y = myTransfer.rxBuff[2];
-        Mouse.move(x, y);
+        
+        Mouse.move(x, 0);
+        Mouse.move(0, y);
         break;
       }
       case MOUSE_DOWN_LEFT:
-        Mouse.press(0);
-        break;
-      case MOUSE_UP_LEFT:
-        Mouse.release(0);
-        break;
-      case MOUSE_DOWN_RIGHT:
         Mouse.press(1);
         break;
-      case MOUSE_UP_RIGHT:
+      case MOUSE_UP_LEFT:
         Mouse.release(1);
+        break;
+      case MOUSE_DOWN_RIGHT:
+        Mouse.press(0);
+        break;
+      case MOUSE_UP_RIGHT:
+        Mouse.release(0);
         break;
     }
     

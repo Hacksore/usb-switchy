@@ -9,3 +9,8 @@ I want to build something that overcomes the delay that mondern KVMs have. They 
 ### Diagram for Mouse
 
 ![Imgur](https://i.imgur.com/rOVhqUp.png)
+
+
+# Install lib
+
+`ln -s myutil/ ~/Documents/Arduino/libraries`
