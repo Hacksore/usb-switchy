@@ -1,14 +1,12 @@
 #include "mouse_emulator.h"
+#include "SerialTransfer.h"
 
 #include <hidboot.h>
 #include <usbhub.h>
 #include <SPI.h>
+#include <myutil.h>
 
-// CONSTANTS
-const int MOUSE_MOVE = 0;
-const int MOUSE_CLICK_LEFT = 1;
-const int MOUSE_CLICK_RIGHT = 2;
-const int BAUD_RATE = 115200;
+const int BAUD_RATE = 9600;
 
 ////////////////////////////
 class MouseRptParser : public MouseReportParser {
@@ -22,19 +20,31 @@ protected:
   void OnMiddleButtonDown (MOUSEINFO *mi);
 };
 
-void transmitData(byte payload[]) {
-  // TODO: where do I keep track of active arduino?
-  Serial.write(payload, sizeof(payload));
+// INSTANCES
+USB Usb;
+USBHub Hub(&Usb);
+HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
+MouseRptParser Prs;
+SerialTransfer myTransfer;
+
+void transmitData(uint8_t packet[]) {
+  int arrayLength = sizeof(packet) / sizeof(uint8_t);
+
+  for(int i=0; i<arrayLength; i++){
+    myTransfer.txBuff[i] = packet[i];
+  }
+  
+  myTransfer.sendData(arrayLength);
 }
 
 void MouseRptParser::OnMouseMove(MOUSEINFO *mi) {
   int mouseX = mi->dX;
   int mouseY = mi->dY;
 
-  byte payload[3] = {
+  uint8_t payload[3] = {
     MOUSE_MOVE,
-    mouseX,
-    mouseY
+    char(mouseX),
+    char(mouseY)
   };
 
   transmitData(payload);
@@ -42,54 +52,63 @@ void MouseRptParser::OnMouseMove(MOUSEINFO *mi) {
 };
 
 void MouseRptParser::OnLeftButtonUp (MOUSEINFO *mi) {
+  uint8_t payload[1] = {
+    MOUSE_UP_LEFT
+  };
 
+  transmitData(payload);
 };
 
 void MouseRptParser::OnLeftButtonDown (MOUSEINFO *mi) {
-  byte payload[1] = {
-    MOUSE_CLICK_LEFT      
+  uint8_t payload[1] = {
+    MOUSE_DOWN_LEFT
   };
 
   transmitData(payload);
 };
 
 void MouseRptParser::OnRightButtonUp  (MOUSEINFO *mi) {
+  uint8_t payload[1] = {
+    MOUSE_UP_RIGHT
+  };
 
+  transmitData(payload);
 };
 
 void MouseRptParser::OnRightButtonDown  (MOUSEINFO *mi) {
+  uint8_t payload[1] = {
+    MOUSE_DOWN_RIGHT
+  };
 
+  transmitData(payload);
 };
 
 void MouseRptParser::OnMiddleButtonUp (MOUSEINFO *mi) {
+  uint8_t payload[1] = {
+    MOUSE_UP_MIDDLE
+  };
 
+  transmitData(payload);
 };
 
 void MouseRptParser::OnMiddleButtonDown (MOUSEINFO *mi) {
+  uint8_t payload[1] = {
+    MOUSE_DOWN_MIDDLE
+  };
 
+  transmitData(payload);
 };
-//////////////
 
-
-// INSTANCES
-USB Usb;
-USBHub Hub(&Usb);
-HIDBoot<USB_HID_PROTOCOL_MOUSE> HidMouse(&Usb);
-MouseRptParser Prs;
 
 MouseEmulator::MouseEmulator() {
   // contructor
 }
 
 void MouseEmulator::begin() {
-  Serial.begin(115200);
-
-  while (!Serial);
-  
-  Serial.println("MouseEmulator begin successfully.");
+  Serial.begin(BAUD_RATE);
+  myTransfer.begin(Serial);
 
   Usb.Init();
-
   delay(200);
   
   HidMouse.SetReportParser(0, &Prs);
@@ -97,4 +116,5 @@ void MouseEmulator::begin() {
 
 void MouseEmulator::loop() {
   Usb.Task();
+  
 }

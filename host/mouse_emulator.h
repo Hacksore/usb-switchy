@@ -15,5 +15,6 @@ class MouseEmulator  {
     // Methods
     void begin();
     void loop();
+    void onPacketReceived(const uint8_t* buffer, size_t size);
 };
 #endif
